@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/instagram/profile", "dest": "/api/instagram/profile.js" },
+    { "src": "/instagram/posts",   "dest": "/api/instagram/posts.js" }
+  ]
+}
