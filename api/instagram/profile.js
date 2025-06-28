@@ -7,11 +7,16 @@ module.exports = async (req, res) => {
   if (!user || token !== BRIDGE_TOKEN) {
     return res.status(400).json({ error: 'Missing user or invalid token' });
   }
+
   try {
-    const url = `https://www.instagram.com/${user}/?__a=1`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    const profile = data.graphql.user;
+    const url = `https://www.instagram.com/api/v1/users/web_profile_info/?username=${user}`;
+    const resp = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)'
+      }
+    });
+    const json = await resp.json();
+    const profile = json.data.user;
     res.json({
       username: profile.username,
       full_name: profile.full_name,
