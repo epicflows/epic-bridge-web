@@ -7,16 +7,22 @@ module.exports = async (req, res) => {
   if (!user || token !== BRIDGE_TOKEN) {
     return res.status(400).json({ error: 'Missing user or invalid token' });
   }
+
   try {
-    const url = `https://www.instagram.com/api/v1/users/web_profile_info/?username=${user}`;
+    const url = `https://www.instagram.com/${user}/?__a=1&__d=dis`;
     const resp = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)'
       }
     });
-    const json = await resp.json();
-    const edges = json.data.user.edge_owner_to_timeline_media.edges
+    const text = await resp.text();
+    const match = text.match(/window\._sharedData = (.+);<\/script>/);
+    if (!match) throw new Error('Could not extract sharedData');
+    const shared = JSON.parse(match[1]);
+    const edges = shared.entry_data.ProfilePage[0].graphql.user
+      .edge_owner_to_timeline_media.edges
       .slice(0, Number(limit));
+
     const media = edges.map(edge => ({
       id: edge.node.id,
       shortcode: edge.node.shortcode,
@@ -30,6 +36,7 @@ module.exports = async (req, res) => {
         ? edge.node.video_url 
         : edge.node.display_url
     }));
+
     res.json(media);
   } catch (err) {
     res.status(500).json({ error: 'Error fetching Instagram posts', details: err.message });
