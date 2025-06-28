@@ -9,14 +9,19 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const url = `https://www.instagram.com/api/v1/users/web_profile_info/?username=${user}`;
+    const url = `https://www.instagram.com/${user}/?__a=1&__d=dis`;
     const resp = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)'
       }
     });
-    const json = await resp.json();
-    const profile = json.data.user;
+    const text = await resp.text();
+    // Extraemos el JSON de window._sharedData
+    const match = text.match(/window\._sharedData = (.+);<\/script>/);
+    if (!match) throw new Error('Could not extract sharedData');
+    const shared = JSON.parse(match[1]);
+    const profile = shared.entry_data.ProfilePage[0].graphql.user;
+
     res.json({
       username: profile.username,
       full_name: profile.full_name,
