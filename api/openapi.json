@@ -1,0 +1,73 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "EPIC Bridge API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/instagram/profile": {
+      "get": {
+        "operationId": "instagram.profile",
+        "parameters": [
+          { "name": "user", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "token", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil de Instagram",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": { "type": "string" },
+                    "full_name": { "type": "string" },
+                    "bio": { "type": "string" },
+                    "followers": { "type": "integer" },
+                    "following": { "type": "integer" },
+                    "posts": { "type": "integer" },
+                    "profile_pic": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instagram/posts": {
+      "get": {
+        "operationId": "instagram.posts",
+        "parameters": [
+          { "name": "user", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 5 } },
+          { "name": "token", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Últimas publicaciones",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "shortcode": { "type": "string" },
+                      "date": { "type": "string", "format": "date-time" },
+                      "caption": { "type": "string" },
+                      "likes": { "type": "integer" },
+                      "comments": { "type": "integer" },
+                      "display_url": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
